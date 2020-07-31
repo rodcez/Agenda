@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿using Agenda.Controllers.Agenda.Commands.DeletarContato;
+using Agenda.Controllers.Agenda.Commands.ObterContatos;
+using Agenda.Controllers.Agenda.Commands.SalvarContato;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,21 +16,31 @@ namespace Agenda.Controllers.Agenda
 
         public AgendaController(IMediator mediator) => _mediator = mediator;
 
+        [HttpGet]
+        [Route("Agenda/ObterContatos/")]
+        public async Task<IActionResult> ObterContatos([FromQuery] ObterContatosCommand request)
+        {
+            var result = await _mediator.Send(request);
+                        
+            return StatusCode(200, result);
+        }
 
         [HttpPost]
         [Route("Agenda/SalvarContato/")]
-        public async Task<IActionResult> SalvarContato([FromBody]SalvarContatoCommand request)
+        public async Task<IActionResult> SalvarContato([FromBody] SalvarContatoCommand request)
         {
-            request.Cenario.PlanosCondicoesComerciais.ForEach(x => x.Coberturas.RemoveAll(y => !y.Selecionado));
-
             var result = await _mediator.Send(request);
 
-            var messages = new List<string>() { "Cenário salvo com sucesso!" };
-            if (result.Messages.Any())
-                messages = result.Messages;
-
-            return StatusCode(result.StatusCode, messages);
+            return StatusCode(200, result);
         }
 
+        [HttpGet]
+        [Route("Agenda/DeletarContato/{IdContato}")]
+        public async Task<IActionResult> DeletarContato([FromQuery] DeletarContatoCommand request)
+        {
+            var result = await _mediator.Send(request);
+
+            return StatusCode(200, result);
+        }
     }
 }

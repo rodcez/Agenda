@@ -14,14 +14,14 @@ window.agendaUi = {
         if (contato.length <= 0)
             return;
 
-        $("inputNome").val(contato[0].Nome);
+        $("#inputNome").val(contato[0].Nome);
 
         contato[0].Emails.forEach(function (email) {
-            $("listaInputEmail").val(email + ";");
+            $("#listaInputEmail").val(email + ";");
         })
 
         contato[0].Telefones.forEach(function (tels) {
-            $("listaInputTel").val(tels + "; ");
+            $("#listaInputTel").val(tels + "; ");
         })
     },
 
@@ -65,19 +65,23 @@ window.agendaUi = {
     },
 
     limparModal: function () {
-        $("inputNome").val("");
+        $("#inputNome").val("");
 
-        $("listaInputEmail").val("");
-        $("inputEmail").val("");
+        $("#listaInputEmail").val("");
+        $("#inputEmail").val("");
 
-        $("listaInputTel").val("");
-        $("inputTel").val("");
+        $("#listaInputTel").val("");
+        $("#inputTel").val("");
 
         $("#btnExcluirContato").show();
     }
 }
 
 window.agendaFunctions = {
+
+    init: function () {
+        window.agendaFunctions.obterListaContato();
+    },
 
     salvarContato: function (callback) {
         $.ajax({
@@ -94,7 +98,7 @@ window.agendaFunctions = {
                 alert(data);
             },
             data: JSON.stringify({
-                contatoAtual
+                Contato: contatoAtual
             })
         })
     },
@@ -141,9 +145,30 @@ window.agendaFunctions = {
     popularObjetoContato: function () {
         contatoAtual = {};
         contatoAtual.idContato = listaContato.length + 1;
-        contatoAtual.Nome = $("inputNome").val();
-        contatoAtual.Emails = $("listaInputEmail").val().split(";");
-        contatoAtual.Telefones = $("listaInputTel").val().split(";");
+        contatoAtual.Nome = $("#inputNome").val();
+        contatoAtual.Emails = $("#listaInputEmail").val().split(";");
+        contatoAtual.Telefones = $("#listaInputTel").val().split(";");
+    },
+
+    validacaoContato: function () {
+        var validacao = true;
+
+        if ($("#inputNome").val() == "") {
+            alert("Campo Nome obrigatório!")
+            validacao = false;
+        }
+
+        if ($("#listaInputEmail").val() == "") {
+            alert("É necessário adicionar pelo menos 1 email.")
+            validacao = false;
+        }
+
+        if ($("#listaInputTel").val() == "") {
+            alert("É necessário adicionar pelo menos 1 telefone.")
+            validacao = false;
+        }
+
+        return validacao;
     }
 }
 
@@ -164,15 +189,28 @@ window.agendaEvents = {
     },
 
     onClickSalvarContato: function () {
-        window.agendaFunctions.popularObjetoContato();
-        window.agendaFunctions.salvarContato();
+        if (window.agendaFunctions.validacaoContato()) {
+            window.agendaFunctions.popularObjetoContato();
+            window.agendaFunctions.salvarContato();
+        }
     },
 
     onClickDeletarContato: function () {
-
         if (confirm("Deseja realmente excluir o contato?")) {
             window.agendaFunctions.popularObjetoContato();
             window.agendaFunctions.deletarContato();
         }
+    },
+
+    onClickAddEmail: function () {
+
+    },
+
+    onClickAddTelefone: function () {
+
     }
 }
+
+$(document).ready(function () {
+    window.agendaFunctions.init();
+});

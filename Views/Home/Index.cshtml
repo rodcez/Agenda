@@ -16,25 +16,6 @@
 
 <div class="container ">
     <div id="divTableContatos"></div>
-
-    @*<table id="tableAgenda" class="table table-striped table-sm table-bordered ">
-        <thead class="thead-dark">
-            <tr>
-                <th>Nome</th>
-                <th>Emails</th>
-                <th>Telefones</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody id="tableContatos">
-            <tr>
-                <td scope="row">Rodrigo Cezario</td>
-                <td>rodrigo.cezario@msn.com</td>
-                <td>(11) 958351111</td>
-                <td> <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#modelContato" onclick="window.agendaEvents.onClickEditarContato(1)">Editar</button> </td>
-            </tr>
-        </tbody>
-    </table>*@
 </div>
 
 <div class="modal fade" id="modelContato" tabindex="-1" role="dialog" aria-hidden="true">
@@ -62,7 +43,7 @@
                             <input type="text" class="form-control" id="inputEmail" placeholder="Email">
                         </div>
                         <div class="col-sm-3">
-                            <button type="submit" class="btn btn-primary">Add+</button>
+                            <button type="submit" class="btn btn-primary" onclick="window.agendaEvents.onClickAddEmail()">Add+</button>
                         </div>
                     </div>
 
@@ -73,15 +54,15 @@
                             <input type="text" class="form-control" id="inputTel" placeholder="(99) 99999-9999">
                         </div>
                         <div class="col-sm-3">
-                            <button type="submit" class="btn btn-primary">Add+</button>
+                            <button type="submit" class="btn btn-primary" onclick="window.agendaEvents.onClickAddTelefone()">Add+</button>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                <button type="button" id="btnExcluirContato" class="btn btn-danger" data-dismiss="modal">Excluir</button>
-                <button type="button" class="btn btn-primary">Salvar</button>
+                <button type="button" id="btnExcluirContato" class="btn btn-danger" onclick="window.agendaEvents.onClickDeletarContato()">Excluir</button>
+                <button type="button" class="btn btn-primary" onclick="window.agendaEvents.onClickSalvarContato()">Salvar</button>
             </div>
         </div>
     </div>

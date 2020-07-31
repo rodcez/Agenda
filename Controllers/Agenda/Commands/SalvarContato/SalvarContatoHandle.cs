@@ -1,4 +1,4 @@
-﻿using Agenda.Infrastructure.Services.Agenda;
+﻿using Agenda.Models;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,21 +8,23 @@ using System.Threading.Tasks;
 
 namespace Agenda.Controllers.Agenda.Commands.SalvarContato
 {
-    public class SalvarContatoHandle : IRequestHandler<SalvarContatoCommand>
+    public class SalvarContatoHandle : IRequestHandler<SalvarContatoCommand, Contato>
     {
-        private readonly IAgendaRepository _repository;
+        //private readonly IAgendaRepository _repository;
 
-        public SalvarContatoHandle(IAgendaRepository repository)
-        {
-            _repository = repository;
-        }
+        //public SalvarContatoHandle(IAgendaRepository repository)
+        //{
+        //    _repository = repository;
+        //}
 
-        public async Task<Unit> Handle(SalvarContatoCommand request, CancellationToken cancellationToken)
+        public async Task<Contato> Handle(SalvarContatoCommand request, CancellationToken cancellationToken)
         {
             ////Caso tivesse uma camada de persistencia de dados ou chamasse uma API
+            ///
+
             //return await _repository.SalvarContato<SalvarContatoCommand>(request); 
 
-            return default;
+            return new Contato();
         }
     }
 }
