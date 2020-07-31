@@ -35,8 +35,8 @@ namespace Agenda.Controllers.Agenda.Commands.ObterContatos
             {
                 listaTempContatos.Add(new Contato()
                 {
-                    IdContato = i,
-                    Nome = $"Nome Exemplo {i}",
+                    IdContato = i + 1,
+                    Nome = $"Nome Exemplo {i + 1}",
                     Emails = new List<string>() { $"nome{i}@exemplo.com" },
                     Telefones = new List<string>() { $"(11)99999999{i}" },
                 }); ;

@@ -14,15 +14,10 @@ window.agendaUi = {
         if (contato.length <= 0)
             return;
 
-        $("#inputNome").val(contato[0].Nome);
+        $("#inputNome").val(contato[0].nome);
+        $("#listaInputEmail").text(contato[0].emails.toString());
+        $("#listaInputTel").text(contato[0].telefones.toString());
 
-        contato[0].Emails.forEach(function (email) {
-            $("#listaInputEmail").val(email + ";");
-        })
-
-        contato[0].Telefones.forEach(function (tels) {
-            $("#listaInputTel").val(tels + "; ");
-        })
     },
 
     criarEstruturaTable: function () {
@@ -51,26 +46,62 @@ window.agendaUi = {
 
         listaContato.forEach(function (contato) {
 
-            var buttonEditar = '<button type="button" class="btn btn - dark" data-toggle="modal" data-target="#modelContato" onclick="window.agendaEvents.onClickEditarContato(' + contato.idContato + ')">Editar</button>';
+            var buttonEditar = '<button type="button" class="btn btn-dark" data-toggle="modal" data-target="#modelContato" onclick="window.agendaEvents.onClickEditarContato(' + contato.idContato + ')">Editar</button>';
 
             $('#tableContatos > tbody').append(
                 '<tr id="idContatoGrid_' + contato.idContato + '">' +
-                '   <td>' + contato.Nome + '</td>' +
-                '   <td>' + contato.Emails.toString().replace(/(.{20})..+/, "$1…") + '</td>' +
-                '   <td>' + contato.Telefones.toString().replace(/(.{20})..+/, "$1…") + '</td>' +
+                '   <td>' + contato.nome + '</td>' +
+                '   <td>' + contato.emails.toString().replace(/(.{30})..+/, "$1…") + '</td>' +
+                '   <td>' + contato.telefones.toString().replace(/(.{30})..+/, "$1…") + '</td>' +
                 '   <td>' + buttonEditar + '</td>' +
                 '</tr> ');
         });
 
+        window.agendaUi.aplicarEstruturaTable();
+    },
+
+    aplicarEstruturaTable: function () {
+        $('#tableContatos').DataTable({
+            "language": {
+                "sEmptyTable": "Nenhum registro encontrado",
+                "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "sInfoEmpty": "",
+                "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                "sInfoPostFix": "",
+                "sInfoThousands": ".",
+                "sLengthMenu": "_MENU_ resultados por página",
+                "sLoadingRecords": "Carregando...",
+                "sProcessing": "Processando...",
+                "sZeroRecords": "Nenhum registro encontrado",
+                "sSearch": "Filtrar: &nbsp;",
+                "oPaginate": {
+                    "sNext": "Próximo",
+                    "sPrevious": "Anterior",
+                    "sFirst": "Primeiro",
+                    "sLast": "Último"
+                },
+                "oAria": {
+                    "sSortAscending": ": Ordenar colunas de forma ascendente",
+                    "sSortDescending": ": Ordenar colunas de forma descendente"
+                },
+                "select": {
+                    "rows": {
+                        "_": "Selecionado %d linhas",
+                        "0": "Nenhuma linha selecionada",
+                        "1": "Selecionado 1 linha"
+                    }
+                }
+            }
+        });
     },
 
     limparModal: function () {
         $("#inputNome").val("");
 
-        $("#listaInputEmail").val("");
+        $("#listaInputEmail").text("");
         $("#inputEmail").val("");
 
-        $("#listaInputTel").val("");
+        $("#listaInputTel").text("");
         $("#inputTel").val("");
 
         $("#btnExcluirContato").show();
@@ -88,14 +119,15 @@ window.agendaFunctions = {
             url: '/Agenda/SalvarContato',
             type: 'post',
             contentType: "application/json",
-            success: function (data) {
+            success: function () {
                 listaContato.push(contatoAtual);
                 window.agendaUi.popularGridContatos();
-                alert(data);
+                alert("Contato adicionado com sucesso!");
+                $('#modelContato').modal('hide');
                 callback && callback();
             },
-            error: function (data) {
-                alert(data);
+            error: function () {
+                alert("Erro ao salvar o contato!");
             },
             data: JSON.stringify({
                 Contato: contatoAtual
@@ -103,7 +135,7 @@ window.agendaFunctions = {
         })
     },
 
-    obterListaContato: function () {
+    obterListaContato: function (callback) {
         $.ajax({
             url: '/Agenda/ObterContatos',
             type: 'get',
@@ -114,29 +146,30 @@ window.agendaFunctions = {
                 callback && callback();
             },
             error: function (data) {
-                alert(data);
+                alert("Erro ao obter a lista de contatos!");
             }
         })
     },
 
-    deletarContato: function () {
+    deletarContato: function (callback) {
         var contato = listaContato.filter(function (c) {
             return c.idContato == idContato;
         });
 
         if (contato.length >= 0) {
             $.ajax({
-                url: '/Agenda/DeletarContato' + contato[0].idContato,
+                url: '/Agenda/DeletarContato/' + contato[0].idContato,
                 type: 'get',
                 contentType: "application/json",
                 success: function (data) {
                     listaContato.splice(listaContato.indexOf(contato[0]), 1);
                     window.agendaUi.popularGridContatos();
-                    alert(data);
+                    alert("Contato deletado com sucesso!");
+                    $('#modelContato').modal('hide');
                     callback && callback();
                 },
                 error: function (data) {
-                    alert(data);
+                    alert("Erro ao deletar o contato!");
                 }
             })
         }
@@ -145,9 +178,9 @@ window.agendaFunctions = {
     popularObjetoContato: function () {
         contatoAtual = {};
         contatoAtual.idContato = listaContato.length + 1;
-        contatoAtual.Nome = $("#inputNome").val();
-        contatoAtual.Emails = $("#listaInputEmail").val().split(";");
-        contatoAtual.Telefones = $("#listaInputTel").val().split(";");
+        contatoAtual.nome = $("#inputNome").val();
+        contatoAtual.emails = $("#listaInputEmail").text().split(",");
+        contatoAtual.telefones = $("#listaInputTel").text().split(",");
     },
 
     validacaoContato: function () {
@@ -158,17 +191,31 @@ window.agendaFunctions = {
             validacao = false;
         }
 
-        if ($("#listaInputEmail").val() == "") {
+        if ($("#listaInputEmail").text() == "") {
             alert("É necessário adicionar pelo menos 1 email.")
             validacao = false;
         }
 
-        if ($("#listaInputTel").val() == "") {
+        if ($("#listaInputTel").text() == "") {
             alert("É necessário adicionar pelo menos 1 telefone.")
             validacao = false;
         }
 
         return validacao;
+    },
+
+    addEmailNaLista: function () {
+        var listaEmail = $("#listaInputEmail").text() + $("#inputEmail").val() + ",";
+
+        $("#listaInputEmail").text(listaEmail);
+        $("#inputEmail").val("");
+    },
+
+    addTelefoneNaLista: function () {
+        var listaTelefone = $("#listaInputTel").text() + $("#inputTel").val() + ",";
+
+        $("#listaInputTel").text(listaTelefone);
+        $("#inputTel").val("");
     }
 }
 
@@ -203,11 +250,11 @@ window.agendaEvents = {
     },
 
     onClickAddEmail: function () {
-
+        window.agendaFunctions.addEmailNaLista();
     },
 
     onClickAddTelefone: function () {
-
+        window.agendaFunctions.addTelefoneNaLista();
     }
 }
 
